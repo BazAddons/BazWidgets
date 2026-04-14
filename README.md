@@ -4,7 +4,7 @@
 
 ![WoW](https://img.shields.io/badge/WoW-12.0_Midnight-blue) ![License](https://img.shields.io/badge/License-GPL_v2-green) ![Version](https://img.shields.io/github/v/tag/bazsec/BazWidgets?label=Version&color=orange)
 
-A widget pack addon for BazWidgetDrawers - adds community and utility widgets that dock into the drawer alongside the built-in ones.
+A widget pack addon for BazWidgetDrawers - **13 ready-to-dock widgets** covering activities, character info, utilities, and tools.
 
 BazWidgets serves two purposes: it provides useful widgets that extend BazWidgetDrawers beyond its core set, and it acts as a reference implementation for third-party addon authors who want to create their own widget packs using the LibBazWidget-1.0 API.
 
@@ -23,12 +23,17 @@ Some widgets are **dormant** - they only appear in the drawer when they're relev
 *   Drag-to-reorder, floating mode, and all host features work automatically
 *   Widget order is preserved across sessions
 
+### Polished Aesthetic
+
+Every widget follows a consistent visual style: leading icon, gold accent for primary values, dim grey for secondary text, status text in the title bar (count, value, summary), and dynamic resizing based on content.
+
 ***
 
 ## Included Widgets
 
-### Dungeon Finder
+### Activity & Group
 
+#### Dungeon Finder
 Queue status panel that auto-appears when you queue for a dungeon via LFG.
 
 *   **Dormant** - only registers when actively queued, disappears when not
@@ -39,8 +44,9 @@ Queue status panel that auto-appears when you queue for a dungeon via LFG.
 *   Leave Queue button
 *   Title switches to green "Group Found!" on proposal
 
-### Repair
+### Character & Gear
 
+#### Repair
 Three-column durability display showing your gear condition at a glance.
 
 *   Paper doll / damaged-slot list / durability percent layout
@@ -49,6 +55,99 @@ Three-column durability display showing your gear condition at a glance.
 *   Three paper-doll modes: custom icon grid, native DurabilityFrame, or none
 *   Option to permanently hide Blizzard's default durability figure
 *   Taint-safe suppression via hooksecurefunc
+
+#### Stat Summary
+Item level header with color-coded secondary stat rows.
+
+*   Item level prominently displayed at the top with statue icon
+*   Crit (gold), Haste (cyan), Mastery (pink), Versatility (green)
+*   Live updates on equipment and rating changes
+
+#### Collection Counter
+Mount and pet collection progress at a glance.
+
+*   Mount and pet icons with owned/total/% display
+*   Force-loads Blizzard_Collections so totals are accurate
+*   Status text shows mount/pet counts compactly
+
+### Currency & Economy
+
+#### Gold Tracker
+Current gold + session gain/loss.
+
+*   Coin icon with formatted gold/silver/copper
+*   Session change tracker (green for gains, red for losses)
+*   Compact gold value (e.g. 1.2k, 1.5M) in the title bar
+
+#### Currency Bar
+Configurable currency tracker with icon list.
+
+*   Per-widget settings to pick which currencies to display
+*   Real currency icons next to names
+*   Quantity / max quantity with progress
+*   Falls back to backpack tracker if no currencies are selected
+*   Dynamically resizes based on the number of tracked currencies
+
+### Navigation & Movement
+
+#### Coordinates
+Player map coordinates with zone name.
+
+*   Map icon, gold X/Y coords (live updating)
+*   Current zone name displayed below
+*   Status text shows coords compactly in the title bar
+
+#### Speed Monitor
+Movement speed % with color-coded progress bar.
+
+*   Sprint icon, large % display, full-width progress bar
+*   Color coding: green (above 100%), white (100%), red (slowed)
+*   Bar scales linearly to 200% maximum
+
+### Weekly Progress
+
+#### Weekly Checklist
+Great Vault progress for Raid, Mythic+, and World rewards.
+
+*   Color-coded source rows: Raid (red), Mythic+ (blue), World (green)
+*   Progress display (e.g. 2/3) with green check when slot is filled
+*   Total slots completed shown in the title bar (e.g. 5/9)
+*   Updates on Weekly Rewards events
+
+### Utilities
+
+#### Note Pad
+Persistent text editor for personal notes.
+
+*   Bordered text area with subtle backdrop
+*   Saved per character via widget settings
+*   Up to 2000 characters
+*   Status text shows current character count
+
+#### Stopwatch
+Simple start/pause/reset stopwatch.
+
+*   Large gold time display (h:mm:ss.s format)
+*   Three buttons: Start/Pause, Reset, -1m (subtract a minute)
+*   Live updating status text in the title bar
+
+#### To-Do List
+Persistent task list with checkboxes.
+
+*   Input box up top - type and press Enter to add a task
+*   Click checkbox to mark complete (greyed out)
+*   Click X to delete a task
+*   Status text shows open count or "all done"
+*   Saves per character
+
+#### Calculator
+Basic 4-function calculator with display panel.
+
+*   Bordered display with right-aligned gold value
+*   5x4 button grid: digits, +/-, decimal, 4 operators, equals, AC, backspace
+*   Color-coded buttons: gold operators, green equals, dim red function keys
+*   0 button spans 2 columns (classic calculator layout)
+*   Handles divide by zero, negation, decimal points
 
 ***
 
@@ -69,8 +168,9 @@ See the [LibBazWidget-1.0 README](https://github.com/bazsec/LibBazWidget) for th
 ## Compatibility
 
 *   **WoW Version:** Retail 12.0 (Midnight)
-*   **Midnight API Safe:** Uses taint-safe patterns throughout
+*   **Midnight API Safe:** Uses taint-safe patterns throughout, no combat log dependencies
 *   **Combat Safe:** No secure frame reparenting or protected method overrides
+*   **Read-only APIs:** Widgets use `C_CurrencyInfo`, `C_Map`, `C_WeeklyRewards`, `C_MountJournal`, `C_PetJournal`, and other read-only game state APIs
 
 ***
 
