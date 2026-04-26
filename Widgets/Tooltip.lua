@@ -84,8 +84,16 @@ local SETTLE_MS   = 80    -- coalesce reflows within this window into one
 -- either width hasn't resolved yet.
 local function ComputeFitScale(tooltip)
     if not frame then return nil end
-    local naturalW = tooltip:GetWidth() or 0
-    if naturalW < 1 then return nil end
+
+    -- GameTooltip:GetWidth() returns a Midnight 12.0 "secret number"
+    -- once item-tooltip data has been processed (the item-link
+    -- pipeline taints downstream widths). Direct arithmetic /
+    -- comparison on the secret number throws when execution is
+    -- tainted by us. Launder through BazCore:SafeNumber to a plain
+    -- Lua number; same fix we applied in BazWidgets SpeedMonitor.
+    local rawW = tooltip:GetWidth()
+    local naturalW = (BazCore.SafeNumber and BazCore:SafeNumber(rawW)) or 0
+    if not naturalW or naturalW < 1 then return nil end
 
     local frameW   = frame:GetWidth() or 0
     local frameEff = frame:GetEffectiveScale() or 1
@@ -217,7 +225,10 @@ local function InstallHooks()
 
         ApplyScaleMonotonic(self, ComputeFitScale(self))
 
-        local ttLogicalH = self:GetHeight() or 0
+        -- Same secret-number caveat as ComputeFitScale: GetHeight on
+        -- an item-data-bearing tooltip is tainted. Launder before
+        -- doing any arithmetic / comparisons.
+        local ttLogicalH = (BazCore.SafeNumber and BazCore:SafeNumber(self:GetHeight())) or 0
         local ttScale    = self:GetScale() or 1
         local hostScale  = frame:GetScale() or 1
         if hostScale < 0.001 then hostScale = 1 end
