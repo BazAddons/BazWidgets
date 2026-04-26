@@ -26,18 +26,6 @@ local hookInstalled      = false
 local lastTooltipHeight  = DESIGN_HEIGHT  -- last GameTooltip height we saw
 
 ---------------------------------------------------------------------------
--- Settings
----------------------------------------------------------------------------
-
-local function IsActive()
-    -- Per-widget toggle — defaults to OFF so users have to explicitly
-    -- opt in. Otherwise enabling the widget would silently start
-    -- redirecting tooltips and look like a "tooltips are broken" bug
-    -- to anyone who didn't read the description.
-    return addon:GetWidgetSetting(WIDGET_ID, "active", false) and true or false
-end
-
----------------------------------------------------------------------------
 -- Frame builder
 ---------------------------------------------------------------------------
 
@@ -84,7 +72,13 @@ end
 
 local function ApplyAnchorTo(tooltip)
     if not frame then return end
-    if not IsActive() then return end
+    -- Skip when the slot itself isn't visible. This covers two cases
+    -- with one check: (a) the user disabled the widget via the
+    -- standard Enabled toggle, which calls widget.frame:Hide(); and
+    -- (b) the drawer is collapsed, which hides our parent chain.
+    -- In either case anchoring would resolve to an off-screen position
+    -- and confuse the user.
+    if not frame:IsVisible() then return end
     tooltip:ClearAllPoints()
     -- BOTTOMRIGHT-anchor so the tooltip's bottom edge stays planted on
     -- our slot's bottom-right; content extends up and to the left as
@@ -105,9 +99,12 @@ local function InstallHooks()
 
     -- Track the live tooltip height so the widget can grow / shrink
     -- alongside the visible tooltip. Drives _desiredHeight, which BWD's
-    -- WidgetHost reads to size the slot.
+    -- WidgetHost reads to size the slot. We skip the Reflow when our
+    -- frame isn't visible — Reflow would needlessly thrash the rest
+    -- of the drawer if the user has disabled the widget or the drawer
+    -- is collapsed.
     GameTooltip:HookScript("OnSizeChanged", function(self)
-        if not IsActive() then return end
+        if not frame or not frame:IsVisible() then return end
         local h = self:GetHeight() or DESIGN_HEIGHT
         if h < DESIGN_HEIGHT then h = DESIGN_HEIGHT end
         if math.abs(h - lastTooltipHeight) > 1 then
@@ -130,48 +127,11 @@ local function InstallHooks()
 end
 
 ---------------------------------------------------------------------------
--- Per-widget settings
----------------------------------------------------------------------------
-
-function Tooltip:GetOptionsArgs()
-    return {
-        activeHeader = {
-            order = 1,
-            type  = "header",
-            name  = "Tooltip Anchor",
-        },
-        active = {
-            order = 2,
-            type  = "toggle",
-            name  = "Anchor Tooltips Here",
-            desc  = "When on, default-anchored tooltips (item / unit / spell / quest hovers) appear inside this widget's slot in the drawer, growing upward from the bottom. When off, the slot stays in place but Blizzard's normal anchoring is used.",
-            get   = function() return IsActive() end,
-            set   = function(_, val)
-                addon:SetWidgetSetting(WIDGET_ID, "active", val and true or false)
-            end,
-        },
-        note = {
-            order = 3,
-            type  = "note",
-            style = "info",
-            text  = "Some addons hardcode their own tooltip anchor (e.g. ANCHOR_RIGHT off a button) and will keep it — this widget only redirects tooltips that use the default anchor. Coverage is typically ~80%: bags, action bars, unit frames, quest log, character pane.",
-        },
-    }
-end
-
----------------------------------------------------------------------------
 -- Widget host hooks
 ---------------------------------------------------------------------------
 
 function Tooltip:GetDesiredHeight()
     return math.max(lastTooltipHeight, DESIGN_HEIGHT)
-end
-
-function Tooltip:GetStatusText()
-    if IsActive() then
-        return "active", 0.5, 0.95, 0.5
-    end
-    return "off", 0.7, 0.7, 0.7
 end
 
 ---------------------------------------------------------------------------
@@ -192,8 +152,6 @@ function Tooltip:Init()
         -- pinned tooltips naturally behave.
         defaultDockToBottom = true,
         GetDesiredHeight    = function() return Tooltip:GetDesiredHeight() end,
-        GetStatusText       = function() return Tooltip:GetStatusText() end,
-        GetOptionsArgs      = function() return Tooltip:GetOptionsArgs() end,
     })
 
     InstallHooks()

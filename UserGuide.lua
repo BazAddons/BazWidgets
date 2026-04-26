@@ -64,6 +64,14 @@ BazCore:RegisterUserGuide("BazWidgets", {
                     "Headline tints yellow when better gear is sitting in your bags",
                     "Live updates on equipment changes",
                 }},
+                { type = "h2", text = "Tooltip" },
+                { type = "list", items = {
+                    "A docked slot that anchors the global GameTooltip — item, unit, spell, and quest hovers appear inside the drawer instead of at the cursor",
+                    "Defaults to the drawer's bottom edge: tooltip's bottom stays planted, content grows upward as the tooltip extends",
+                    "Slot height tracks the live tooltip height; other bottom-stack widgets shift up as the tooltip grows",
+                    "Auto-dismisses when the drawer collapses or the widget is disabled",
+                }},
+                { type = "note", style = "info", text = "The Tooltip widget only redirects |cffffd700default-anchored|r tooltips. Some addons hardcode their own anchor (e.g. ANCHOR_RIGHT off a button) and will keep it — typical coverage is ~80% (bags, action bars, unit frames, quest log, character pane)." },
                 { type = "h2", text = "Collection Counter" },
                 { type = "list", items = {
                     "Mount and pet collection progress",
