@@ -57,6 +57,13 @@ BazCore:RegisterUserGuide("BazWidgets", {
                     "Color-coded secondary stat rows: Crit (gold), Haste (cyan), Mastery (pink), Versatility (green)",
                     "Live updates on equipment and rating changes",
                 }},
+                { type = "h2", text = "Item Level" },
+                { type = "list", items = {
+                    "Headline equipped iLevel rounded to one decimal",
+                    "Sub-label shows your overall (best-available) average when it differs from equipped",
+                    "Headline tints yellow when better gear is sitting in your bags",
+                    "Live updates on equipment changes",
+                }},
                 { type = "h2", text = "Collection Counter" },
                 { type = "list", items = {
                     "Mount and pet collection progress",
