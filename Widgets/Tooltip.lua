@@ -132,6 +132,8 @@ local function ScheduleReflow()
     end)
 end
 
+local settleTimer  -- one-shot scale-settle timer per tooltip session
+
 local function ApplyAnchorTo(tooltip)
     if not frame then return end
     -- Skip when the slot itself isn't visible. This covers two cases
@@ -142,14 +144,8 @@ local function ApplyAnchorTo(tooltip)
     -- and confuse the user.
     if not frame:IsVisible() then return end
 
-    -- Scale the tooltip to fit the slot width before re-anchoring.
-    -- Width may not be resolved at this point (SetDefaultAnchor often
-    -- runs before content is set), so we apply a best-effort scale
-    -- here and let OnSizeChanged refine it once content fills in.
-    -- New tooltip session — clear the hysteresis baseline so the
-    -- first scale we compute always lands.
+    -- New tooltip session — clear the hysteresis baseline.
     lastAppliedScale = nil
-    ApplyScaleWithHysteresis(tooltip, ComputeFitScale(tooltip))
 
     tooltip:ClearAllPoints()
     -- BOTTOMRIGHT-anchor so the tooltip's bottom edge stays planted on
@@ -157,6 +153,25 @@ local function ApplyAnchorTo(tooltip)
     -- the tooltip grows. Matches the standard "bottom-right pinned
     -- tooltip" UX.
     tooltip:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, 0)
+
+    -- Best-effort initial scale (often the tooltip width is 0 here
+    -- because content hasn't been set yet — ComputeFitScale will
+    -- return nil and we'll skip).
+    ApplyScaleWithHysteresis(tooltip, ComputeFitScale(tooltip))
+
+    -- Schedule a one-shot settle rescale: ~150 ms is long enough for
+    -- async content (item info, aura data, scenario blocks) to finish
+    -- populating but short enough to feel responsive. We deliberately
+    -- DON'T rescale on every OnSizeChanged — that triggered a feedback
+    -- loop where each SetScale altered text-wrap, changed naturalW,
+    -- fired another OnSizeChanged, and so on. One settle is enough.
+    if settleTimer then settleTimer:Cancel() end
+    settleTimer = C_Timer.NewTimer(0.15, function()
+        settleTimer = nil
+        if not tooltip:IsShown() then return end
+        if not frame or not frame:IsVisible() then return end
+        ApplyScaleWithHysteresis(tooltip, ComputeFitScale(tooltip))
+    end)
 end
 
 local function InstallHooks()
@@ -179,10 +194,14 @@ local function InstallHooks()
     -- tooltip's rendered pixel height, so:
     --   designHeight * hostScale  ==  ttLogicalH * ttScale
     --   designHeight = ttLogicalH * ttScale / hostScale
+    -- Track height ONLY — no rescaling here. Rescaling on every
+    -- size change was the source of the jitter: each SetScale shifted
+    -- font kerning enough to alter text wrapping, which changed the
+    -- tooltip's logical width, which fired OnSizeChanged again, which
+    -- triggered another rescale, etc. The scale is set once on anchor
+    -- and refined once after a 150 ms settle (see ApplyAnchorTo).
     GameTooltip:HookScript("OnSizeChanged", function(self)
         if not frame or not frame:IsVisible() then return end
-
-        ApplyScaleWithHysteresis(self, ComputeFitScale(self))
 
         local ttLogicalH = self:GetHeight() or 0
         local ttScale    = self:GetScale() or 1
@@ -191,17 +210,20 @@ local function InstallHooks()
 
         local design = (ttLogicalH * ttScale) / hostScale
         if design < DESIGN_HEIGHT then design = DESIGN_HEIGHT end
-        -- Larger threshold (HEIGHT_HYST) than before — a 1-px wobble
-        -- from async content updates was triggering Reflow chains.
         if math.abs(design - lastTooltipHeight) >= HEIGHT_HYST then
             lastTooltipHeight = design
             ScheduleReflow()
         end
     end)
 
-    -- When the tooltip closes, fall back to the minimum slot height.
+    -- When the tooltip closes, fall back to the minimum slot height
+    -- and clear the scale hysteresis + cancel any pending settle.
     GameTooltip:HookScript("OnHide", function()
         lastAppliedScale = nil
+        if settleTimer then
+            settleTimer:Cancel()
+            settleTimer = nil
+        end
         if math.abs(lastTooltipHeight - DESIGN_HEIGHT) >= HEIGHT_HYST then
             lastTooltipHeight = DESIGN_HEIGHT
             ScheduleReflow()
