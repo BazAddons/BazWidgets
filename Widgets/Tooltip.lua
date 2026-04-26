@@ -72,11 +72,16 @@ end
 
 -- Floor for the dynamic scale — below this and the tooltip text gets
 -- hard to read at any reasonable drawer width.
-local MIN_SCALE = 0.5
+local MIN_SCALE   = 0.5
+local SCALE_STEP  = 0.05  -- snap-to-grid: small width fluctuations don't cross a step
+local SCALE_HYST  = 0.025 -- ignore scale changes smaller than half a step
+local HEIGHT_HYST = 4     -- ignore slot-height changes under 4 design-px
+local SETTLE_MS   = 80    -- coalesce reflows within this window into one
 
 -- Compute the tooltip scale that makes its rendered pixel width match
--- the slot's rendered pixel width. Returns nil if either width hasn't
--- resolved yet (tooltip just opened, no content yet).
+-- the slot's rendered pixel width, snapped to SCALE_STEP increments to
+-- damp flutter from async content-width fluctuations. Returns nil if
+-- either width hasn't resolved yet.
 local function ComputeFitScale(tooltip)
     if not frame then return nil end
     local naturalW = tooltip:GetWidth() or 0
@@ -95,7 +100,36 @@ local function ComputeFitScale(tooltip)
     local s = (frameW * frameEff) / (naturalW * ttParentEff)
     if s > 1.0 then s = 1.0 end           -- never enlarge past natural
     if s < MIN_SCALE then s = MIN_SCALE end
+    -- Snap to nearest grid step so a 1-px naturalW fluctuation doesn't
+    -- yield a slightly different scale every OnSizeChanged.
+    s = math.floor(s / SCALE_STEP + 0.5) * SCALE_STEP
     return s
+end
+
+local lastAppliedScale = nil
+local function ApplyScaleWithHysteresis(tooltip, s)
+    if not s then return end
+    if lastAppliedScale and math.abs(lastAppliedScale - s) < SCALE_HYST then
+        return
+    end
+    lastAppliedScale = s
+    tooltip:SetScale(s)
+end
+
+-- Coalesce reflow requests in a short window. Many OnSizeChanged
+-- events fire in quick succession as item info / aura data caches
+-- populate; calling Reflow on each was the source of visible "snap"
+-- jitter in surrounding widgets.
+local reflowPending = false
+local function ScheduleReflow()
+    if reflowPending then return end
+    reflowPending = true
+    C_Timer.After(SETTLE_MS / 1000, function()
+        reflowPending = false
+        if addon.WidgetHost and addon.WidgetHost.Reflow then
+            addon.WidgetHost:Reflow()
+        end
+    end)
 end
 
 local function ApplyAnchorTo(tooltip)
@@ -112,8 +146,10 @@ local function ApplyAnchorTo(tooltip)
     -- Width may not be resolved at this point (SetDefaultAnchor often
     -- runs before content is set), so we apply a best-effort scale
     -- here and let OnSizeChanged refine it once content fills in.
-    local s = ComputeFitScale(tooltip)
-    if s then tooltip:SetScale(s) end
+    -- New tooltip session — clear the hysteresis baseline so the
+    -- first scale we compute always lands.
+    lastAppliedScale = nil
+    ApplyScaleWithHysteresis(tooltip, ComputeFitScale(tooltip))
 
     tooltip:ClearAllPoints()
     -- BOTTOMRIGHT-anchor so the tooltip's bottom edge stays planted on
@@ -146,8 +182,7 @@ local function InstallHooks()
     GameTooltip:HookScript("OnSizeChanged", function(self)
         if not frame or not frame:IsVisible() then return end
 
-        local s = ComputeFitScale(self)
-        if s then self:SetScale(s) end
+        ApplyScaleWithHysteresis(self, ComputeFitScale(self))
 
         local ttLogicalH = self:GetHeight() or 0
         local ttScale    = self:GetScale() or 1
@@ -156,21 +191,20 @@ local function InstallHooks()
 
         local design = (ttLogicalH * ttScale) / hostScale
         if design < DESIGN_HEIGHT then design = DESIGN_HEIGHT end
-        if math.abs(design - lastTooltipHeight) > 1 then
+        -- Larger threshold (HEIGHT_HYST) than before — a 1-px wobble
+        -- from async content updates was triggering Reflow chains.
+        if math.abs(design - lastTooltipHeight) >= HEIGHT_HYST then
             lastTooltipHeight = design
-            if addon.WidgetHost and addon.WidgetHost.Reflow then
-                addon.WidgetHost:Reflow()
-            end
+            ScheduleReflow()
         end
     end)
 
     -- When the tooltip closes, fall back to the minimum slot height.
     GameTooltip:HookScript("OnHide", function()
-        if math.abs(lastTooltipHeight - DESIGN_HEIGHT) > 1 then
+        lastAppliedScale = nil
+        if math.abs(lastTooltipHeight - DESIGN_HEIGHT) >= HEIGHT_HYST then
             lastTooltipHeight = DESIGN_HEIGHT
-            if addon.WidgetHost and addon.WidgetHost.Reflow then
-                addon.WidgetHost:Reflow()
-            end
+            ScheduleReflow()
         end
     end)
 end
