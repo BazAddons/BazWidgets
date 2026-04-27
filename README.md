@@ -102,7 +102,7 @@ Item level header with color-coded secondary stat rows.
 Mount and pet collection progress at a glance.
 
 *   Mount and pet icons with owned/total/% display
-*   Force-loads Blizzard_Collections so totals are accurate
+*   Counts stay current without needing to open the Collections window first
 *   Status text shows mount/pet counts compactly
 
 #### Trinket Tracker
@@ -251,9 +251,8 @@ See the [LibBazWidget-1.0 README](https://github.com/bazsec/LibBazWidget) for th
 ## Compatibility
 
 *   **WoW Version:** Retail 12.0 (Midnight)
-*   **Midnight API Safe:** Uses taint-safe patterns throughout, no combat log dependencies
-*   **Combat Safe:** No secure frame reparenting or protected method overrides
-*   **Read-only APIs:** Widgets use `C_CurrencyInfo`, `C_Map`, `C_WeeklyRewards`, `C_MountJournal`, `C_PetJournal`, and other read-only game state APIs
+*   **Taint-safe** — read-only widgets only, no protected frame mutations
+*   **Combat-safe** — widgets that depend on game state (Trinket Tracker, Pull Timer, etc.) gracefully handle combat lockdown
 
 ***
 
