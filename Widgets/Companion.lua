@@ -25,7 +25,7 @@ local CompanionWidget = {}
 addon.CompanionWidget = CompanionWidget
 
 -- Debug logging - flip to true to print resolved companion data
-local DEBUG = true
+local DEBUG = false
 local function dprint(...)
     if DEBUG then
         print("|cffffd700[Companion]|r", ...)
