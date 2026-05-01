@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Tracked Reputation
 --
 -- Always-on widget that shows a single user-picked faction's standing

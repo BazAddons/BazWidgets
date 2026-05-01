@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Delve Companion
 --
 -- Dormant widget that auto-shows when you're in a scenario (delve) and

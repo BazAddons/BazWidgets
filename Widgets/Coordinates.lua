@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Coordinates
 --
 -- Shows player map coordinates with a compass icon and zone name.

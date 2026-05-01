@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Collection Counter
 --
 -- Shows mount and pet collection counts with completion percentages.

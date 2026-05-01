@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Currency Bar
 --
 -- Tracks selected currencies in a compact list with icons.

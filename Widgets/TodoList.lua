@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: To-Do List
 --
 -- Persistent task list with checkboxes. Click a check to mark complete,

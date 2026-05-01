@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Bountiful Tracker
 --
 -- Surfaces delve-related currencies: Restored Coffer Keys (currency 3028)

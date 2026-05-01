@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Tooltip
 --
 -- A docked slot whose only job is to be the anchor for the global

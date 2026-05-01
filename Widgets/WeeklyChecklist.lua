@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Weekly Checklist
 --
 -- Tracks weekly content completion: vault progress (M+, raid, world),

@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Hearthstone Cooldown
 --
 -- Dormant widget that auto-shows while your Hearthstone is on cooldown

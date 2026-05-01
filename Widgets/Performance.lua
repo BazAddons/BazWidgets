@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Performance
 --
 -- Always-on widget showing FPS and latency (home + world). Color-coded

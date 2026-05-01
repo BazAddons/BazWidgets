@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Gold Tracker
 --
 -- Shows current gold and session change with iconography.

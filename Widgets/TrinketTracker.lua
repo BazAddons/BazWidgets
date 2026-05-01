@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Trinket Tracker
 --
 -- Always-on widget showing your two equipped trinkets with icons,

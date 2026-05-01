@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: FPS
 --
 -- Compact FPS-only readout. Lighter complement to the Performance

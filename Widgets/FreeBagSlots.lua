@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Free Bag Slots
 --
 -- Always-on widget showing how many empty inventory slots you have left

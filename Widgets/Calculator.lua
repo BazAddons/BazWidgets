@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Calculator
 --
 -- Basic 4-function calculator with display and number pad.

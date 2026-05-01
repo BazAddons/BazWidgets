@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Item Level
 --
 -- Headline equipped iLevel with the overall (best-available) iLevel as a

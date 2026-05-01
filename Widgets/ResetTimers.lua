@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Reset Timers
 --
 -- Always-on widget showing time until next daily and weekly resets.

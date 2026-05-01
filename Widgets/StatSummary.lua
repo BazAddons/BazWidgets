@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Stat Summary
 --
 -- Compact display of item level + key secondary stats.

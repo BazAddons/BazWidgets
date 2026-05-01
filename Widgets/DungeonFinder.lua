@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgetDrawers Widget: Dungeon Finder
 --
 -- Queue status panel showing role fills, wait time, queue timer, and

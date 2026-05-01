@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgetDrawers Widget: Repair
 --
 -- Paper-doll mini view + list of damaged equipment slots with their

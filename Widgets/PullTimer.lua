@@ -1,3 +1,4 @@
+-- SPDX-License-Identifier: GPL-2.0-or-later
 -- BazWidgets Widget: Pull Timer
 --
 -- Dormant widget that auto-shows when you enter combat, tracks how long
