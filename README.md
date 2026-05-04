@@ -2,7 +2,7 @@
 
 # BazWidgets
 
-![WoW](https://img.shields.io/badge/WoW-12.0_Midnight-blue) ![License](https://img.shields.io/badge/License-GPL_v2-green) ![Version](https://img.shields.io/github/v/tag/bazsec/BazWidgets?label=Version&color=orange)
+![Part of BazAddons](https://img.shields.io/badge/Part_of-BazAddons-b8924a?labelColor=2a2519) ![WoW](https://img.shields.io/badge/WoW-12.0_Midnight-blue) ![License](https://img.shields.io/badge/License-GPL_v2-green) ![Version](https://img.shields.io/github/v/tag/BazAddons/BazWidgets?label=Version&color=orange)
 
 A widget pack addon for BazWidgetDrawers - **26 ready-to-dock widgets** covering activities, character info, currency, navigation, weekly progress, and utilities. Many are dormant, registering themselves only when relevant (queued, in combat, in a delve, hearthstone on cooldown, etc.) so they never waste drawer space.
 
@@ -244,7 +244,7 @@ Want to create your own widget pack? BazWidgets is your reference. Each widget f
 4.  Or use `LibStub("LibBazWidget-1.0"):RegisterDormantWidget()` for contextual widgets
 5.  Implement optional callbacks: `GetDesiredHeight()`, `GetStatusText()`, `GetOptionsArgs()`
 
-See the [LibBazWidget-1.0 README](https://github.com/bazsec/LibBazWidget) for the full widget contract.
+See the [LibBazWidget-1.0 README](https://github.com/BazAddons/LibBazWidget) for the full widget contract.
 
 ***
 
